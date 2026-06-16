@@ -29,6 +29,7 @@ Python 3.8 or Higher
 Ollama Inference Engine: Installed and running locally.
 
 Target Model: The default benchmark runs against qwen2.5:7b. You can pull it using your terminal:
+(or if using LM Studio make sure to have the model running)
 
 ```Bash
 ollama run qwen2.5:7b
