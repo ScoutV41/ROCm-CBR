@@ -5,15 +5,23 @@ A standardized, community-driven hardware profiling and LLM inference benchmark 
 By crowdsourcing performance data across varied systems, this tool eliminates guesswork and creates an authentic baseline for consumer and enterprise hardware alike.
 
 Key Features
+###
 Robust AMD GPU Profiling: Moves past primitive OS naming conventions. It executes native rocm-smi JSON queries on Linux and parses structured dxdiag XML trees on Windows to extract exact architecture series and true VRAM metrics.
 
-Quantization Tagging: Automatically queries Ollama's local /api/show endpoint prior to execution. This maps the exact quantization family (such as Q4_K_M or FP16) to ensure fair data categorization on the backend.
+Quantization Tagging: 
+###
+Automatically queries Ollama's local /api/show endpoint prior to execution. This maps the exact quantization family (such as Q4_K_M or FP16) to ensure fair data categorization on the backend.
 
-Deterministic Baselines: Enforces a rigid 2048 context window payload limit. This locks down the attention matrix memory footprint, guaranteeing a true apples-to-apples performance comparison across all volunteer systems.
+Deterministic Baselines:
+###
+Enforces a rigid 2048 context window payload limit. This locks down the attention matrix memory footprint, guaranteeing a true apples-to-apples performance comparison across all volunteer systems.
 
-NVIDIA Fallback Support: Seamlessly falls back to GPUtil if an NVIDIA card is present, allowing cross-vendor comparative analysis.
+NVIDIA Fallback Support: 
+###
+Seamlessly falls back to GPUtil if an NVIDIA card is present, allowing cross-vendor comparative analysis.
 
 Prerequisites
+###
 Before running the benchmark, ensure you have the following components set up on your machine:
 
 Python 3.8 or Higher
