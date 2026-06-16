@@ -8,10 +8,6 @@ Key Features
 ###
 Robust AMD GPU Profiling: Moves past primitive OS naming conventions. It executes native rocm-smi JSON queries on Linux and parses structured dxdiag XML trees on Windows to extract exact architecture series and true VRAM metrics.
 
-Quantization Tagging: 
-###
-Automatically queries Ollama's local /api/show endpoint prior to execution. This maps the exact quantization family (such as Q4_K_M or FP16) to ensure fair data categorization on the backend.
-
 Deterministic Baselines:
 ###
 Enforces a rigid 2048 context window payload limit. This locks down the attention matrix memory footprint, guaranteeing a true apples-to-apples performance comparison across all volunteer systems.
@@ -28,12 +24,8 @@ Python 3.8 or Higher
 
 Ollama Inference Engine: Installed and running locally.
 
-Target Model: The default benchmark runs against qwen2.5:7b. You can pull it using your terminal:
-(or if using LM Studio make sure to have the model running)
+Target Model: The default benchmark runs against qwen2.5:7b. make sure to have LM Studio running and the model downloaded (the script will prompt which model to use on startup)
 
-```Bash
-ollama run qwen2.5:7b
-```
 Quick Start
 1. Clone the Repository
 ```Bash
