@@ -22,26 +22,31 @@ Ollama Inference Engine: Installed and running locally.
 
 Target Model: The default benchmark runs against qwen2.5:7b. You can pull it using your terminal:
 
-Bash
+```Bash
 ollama run qwen2.5:7b
+```
 Quick Start
 1. Clone the Repository
-Bash
+```Bash
 git clone https://github.com/your-username/rocm-crowdsourced-benchmark.git
 cd rocm-crowdsourced-benchmark
+```
 2. Install Dependencies
 Install the required hardware tracking and networking packages:
 
-Bash
+```Bash
 pip install psutil gputil requests
+```
 3. Run the Benchmark
 Execute the script to profile your hardware and run the local inference test:
 
-Bash
+```Bash
 python benchmark_runner.py
+```
 Telemetry Payload Structure
 The script compiles a structured JSON object ready for database submission. It categorizes host hardware and performance separately:
-'''JSON
+
+```JSON
 
 {
     "timestamp": 1718541913,
@@ -69,7 +74,7 @@ The script compiles a structured JSON object ready for database submission. It c
         "generation_tokens_per_sec": 92.15
     }
 }
-'''
+```
  ## License
  This project is licensed under the Apache License 2.0.What this means for you:
 
