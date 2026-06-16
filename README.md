@@ -41,8 +41,7 @@ Bash
 python benchmark_runner.py
 Telemetry Payload Structure
 The script compiles a structured JSON object ready for database submission. It categorizes host hardware and performance separately:
-'''
-JSON
+'''JSON
 
 {
     "timestamp": 1718541913,
