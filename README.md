@@ -1,87 +1,166 @@
+# AETHER - Local AI Inference Benchmark
 
-### AETHER ROCm Crowdsourced Benchmark Runner
-A standardized, community-driven hardware profiling and LLM inference benchmark tool. This project gathers real-world telemetry from volunteers to build an open, comparative index of local AI performance, with special attention given to native AMD ROCm optimization.
+**Cross-platform, crowdsourced performance benchmarking for local AI inference.**  
+Run a standardized test on your hardware, share your results, help build the first real-world database of local LLM performance across AMD, NVIDIA, and CPU setups.
 
-By crowdsourcing performance data across varied systems, this tool eliminates guesswork and creates an authentic baseline for consumer and enterprise hardware alike.
+ · Tested on AMD RX 9070 XT
 
-Key Features
-###
-Robust AMD GPU Profiling: Moves past primitive OS naming conventions. It executes native rocm-smi JSON queries on Linux and parses structured dxdiag XML trees on Windows to extract exact architecture series and true VRAM metrics.
+---
 
-Deterministic Baselines:
-###
-Enforces a rigid 2048 context window payload limit. This locks down the attention matrix memory footprint, guaranteeing a true apples-to-apples performance comparison across all volunteer systems.
+## Why this exists
 
-NVIDIA Fallback Support: 
-###
-Seamlessly falls back to GPUtil if an NVIDIA card is present, allowing cross-vendor comparative analysis.
+Every local AI benchmark that exists today either:
+- Tests raw GPU compute (FLOPS, memory bandwidth) - not inference speed
+- Only covers NVIDIA/CUDA
+- Has no community dataset to compare against
 
-Prerequisites
-###
-Before running the benchmark, ensure you have the following components set up on your machine:
+AETHER benchmarks what actually matters: **how fast does a real model generate tokens on your real hardware**, and how does that compare to everyone else with the same card?
 
-Python 3.8 or Higher
+---
 
-Ollama Inference Engine: Installed and running locally.
+## What it measures
 
-Target Model: The default benchmark runs against qwen2.5:7b. make sure to have LM Studio running and the model downloaded (the script will prompt which model to use on startup)
+- **Generation speed** (tokens/sec) - the number that actually matters for usability
+- **Prompt evaluation speed** - how fast your hardware processes the input
+- **Hardware profile** - GPU model, VRAM, driver, ROCm/CUDA version, CPU, RAM
+- **Acceleration backend** - DirectML, Vulkan, ROCm, or CUDA (whatever your setup uses)
+- **Model info** - quantization level, format, family
 
-Quick Start
-1. Clone the Repository
-```Bash
-git clone https://github.com/your-username/rocm-crowdsourced-benchmark.git
-cd rocm-crowdsourced-benchmark
+All results are saved locally to `benchmark_result.json`. Nothing is uploaded automatically - you share what you want, when you want.
+
+---
+
+## Supported setups
+
+| Hardware | OS | Backend |
+|---|---|---|
+| AMD GPU (RX 6000+) | Windows | DirectML / Vulkan via LM Studio |
+| AMD GPU (RX 6000+) | Linux | ROCm via Ollama or LM Studio |
+| NVIDIA GPU | Windows / Linux | CUDA via Ollama or LM Studio |
+| CPU only | Any | Ollama or LM Studio |
+| Apple Silicon | macOS | Metal via Ollama or LM Studio |
+
+---
+
+## Requirements
+
+- Python 3.10+
+- [LM Studio](https://lmstudio.ai) **or** [Ollama](https://ollama.com) running locally with at least one vision-capable model loaded
+- A loaded model (recommended: `qwen2.5-vl-7b-instruct` or `qwen2.5:7b`)
+
+```bash
+pip install psutil GPUtil requests
 ```
-2. Install Dependencies
-Install the required hardware tracking and networking packages:
 
-```Bash
-pip install psutil gputil requests
+> **Note:** `GPUtil` is for NVIDIA detection. If you're on AMD or CPU-only, it's optional - AETHER will warn you if it's missing but continue fine.
+
+---
+
+## Setup
+
+**1. Clone the repo**
+```bash
+git clone https://github.com/Scout316/aether-bench
+cd aether-bench
 ```
-3. Run the Benchmark
-Execute the script to profile your hardware and run the local inference test:
 
-```Bash
-python AETHER.py
+**2. Install dependencies**
+```bash
+pip install psutil GPUtil requests
 ```
-Telemetry Payload Structure
-The script compiles a structured JSON object ready for database submission. It categorizes host hardware and performance separately:
 
-```JSON
+**3. Start your inference backend**
 
-{
-    "timestamp": 1718541913,
-    "hardware": {
-        "os": "Linux",
-        "os_release": "6.8.0-amd64",
-        "cpu_model": "AMD Ryzen 7 7800X3D 8-Core Processor",
-        "cpu_cores_physical": 8,
-        "cpu_cores_logical": 16,
-        "ram_gb": 31.24,
-        "gpu_model": "AMD Radeon RX 7900 XTX",
-        "gpu_vram_gb": 24.0,
-        "gpu_driver": "Unknown"
-    },
-    "performance": {
-        "benchmark_status": "Success",
-        "model_tested": "qwen2.5:7b",
-        "quantization_level": "Q4_K_M",
-        "model_format": "gguf",
-        "context_window_set": 2048,
-        "total_wall_time_sec": 4.12,
-        "prompt_tokens": 18,
-        "generation_tokens": 312,
-        "prompt_eval_tokens_per_sec": 410.5,
-        "generation_tokens_per_sec": 92.15
-    }
-}
+For LM Studio: open the app, load a model, and make sure the local server is running (default port 1234)
+
+For Ollama:
+```bash
+ollama serve
+ollama pull qwen2.5:7b
 ```
- ## License
- This project is licensed under the Apache License 2.0.
- What this means for you:
 
-- You Can: Use, modify, distribute, and sell this software for personal or commercial projects completely free of charge.
- - Patent Protection: Every contributor grants you a royalty-free license to any patents they hold on the code. If anyone sues you over patents in this software, their license is instantly revoked.
- - Keep Notices: You must include a copy of the original license, copyright, and NOTICE file in any distribution.
- - Track Changes: If you modify any existing files in this repository, you must prominently state inside those files that you changed them.
- - No Trademark Rights: This license does not grant you the right to use the project's name, logos, or trademarks.
+**4. Run the benchmark**
+```bash
+python benchmark.py
+```
+
+---
+
+## Example output
+
+```
+╔══════════════════════════════════════════════════════╗
+║         AETHER - AI Compute Benchmark Runner         ║
+║      Open Source · Local Inference · No Uploads      ║
+╚══════════════════════════════════════════════════════╝
+
+[1/4] Profiling hardware...
+
+  OS:     Windows 11
+  CPU:    AMD Ryzen 7 7800X3D 8-Core Processor (8P / 16L cores)
+  RAM:    31.14 GB
+  GPU:    AMD Radeon RX 9070 XT | 15.81 GB VRAM | Driver 32.0.31019.2002
+
+[2/4] Detecting inference backend...
+
+  Backend: LMSTUDIO at http://localhost:1234
+  Available models (1):
+    [0] qwen2.5-vl-7b-instruct
+
+[3/4] Running inference benchmark on 'qwen2.5-vl-7b-instruct'...
+
+  Generation speed:  24.89 tok/s
+  Wall time:         10.44s
+  Tokens generated:  260
+
+[4/4] Saving results to benchmark_result.json...
+
+  Done!
+```
+
+---
+
+## Sharing your results
+
+Results are saved to `benchmark_result.json` in the same folder you ran the script from.
+
+Share them in the **[Discord server](your-discord-link-here)** in the `#submit-results` channel. So I can crowdsource results for comparison charts.
+
+Paste the full JSON or attach the file. Include:
+- Your GPU model
+- Your OS
+- The model + quantization you tested
+- Anything unusual about your setup (undervolted, custom drivers, etc.)
+
+---
+
+## What we're building toward
+
+The goal is a community-maintained database of real-world local inference performance, searchable by GPU, model, quantization, and OS. Think [UserBenchmark](https://www.userbenchmark.com) but for local AI + Performance metrics - and actually trustworthy.
+
+Planned features:
+- [ ] Web dashboard to browse and compare submissions
+- [ ] Multi-model test suite (run 3-5 models in one session)
+- [ ] Acceleration backend auto-detection (DirectML vs ROCm vs CUDA vs Metal)
+- [ ] Optimization recommendations if your score is below average for your card
+- [ ] Automated submission endpoint (opt-in)
+
+---
+
+## Contributing
+
+Pull requests welcome. If you find a bug with GPU detection on your specific setup, open an issue and include your `benchmark_result.json` - hardware detection edge cases are the hardest part of this project and real examples help a lot.
+
+Known gaps:
+- Linux ROCm path is untested (need volunteers with ROCm setups)
+- macOS Metal path is untested  
+- Dual discrete GPU setups pick the highest VRAM card
+
+---
+
+## License
+
+Apache L v.2
+---
+
+*AETHER is part of the [Stardance Challenge](https://stardance.hackclub.com), a summer STEM competition run by Hack Club and sponsored by AMD.*
