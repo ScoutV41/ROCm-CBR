@@ -50,7 +50,7 @@ pip install psutil gputil requests
 Execute the script to profile your hardware and run the local inference test:
 
 ```Bash
-python benchmark_runner.py
+python AETHER.py
 ```
 Telemetry Payload Structure
 The script compiles a structured JSON object ready for database submission. It categorizes host hardware and performance separately:
