@@ -86,37 +86,6 @@ python benchmark.py
 
 ---
 
-## Example output
-
-```
-╔══════════════════════════════════════════════════════╗
-║         AETHER - AI Compute Benchmark Runner         ║
-║      Open Source · Local Inference · No Uploads      ║
-╚══════════════════════════════════════════════════════╝
-
-[1/4] Profiling hardware...
-
-  OS:     Windows 11
-  CPU:    AMD Ryzen 7 7800X3D 8-Core Processor (8P / 16L cores)
-  RAM:    31.14 GB
-  GPU:    AMD Radeon RX 9070 XT | 15.81 GB VRAM | Driver 32.0.31019.2002
-
-[2/4] Detecting inference backend...
-
-  Backend: LMSTUDIO at http://localhost:1234
-  Available models (1):
-    [0] qwen2.5-vl-7b-instruct
-
-[3/4] Running inference benchmark on 'qwen2.5-vl-7b-instruct'...
-
-  Generation speed:  24.89 tok/s
-  Wall time:         10.44s
-  Tokens generated:  260
-
-[4/4] Saving results to benchmark_result.json...
-
-  Done!
-```
 
 ---
 
