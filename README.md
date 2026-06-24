@@ -163,4 +163,3 @@ Known gaps:
 Apache L v.2
 ---
 
-*AETHER is part of the [Stardance Challenge](https://stardance.hackclub.com), a summer STEM competition run by Hack Club and sponsored by AMD.*
