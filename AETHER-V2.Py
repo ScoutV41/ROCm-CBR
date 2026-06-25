@@ -601,7 +601,8 @@ def compute_aether_score(hw: dict, results: dict) -> dict:
 # ==============================================================================
 
 def main_menu():
-    hw = get_system_specs(cpu_only_override=False)
+    # Lazy loading hardware info placeholders so terminal boots up instantaneously
+    hw = None
     backend, base_url = detect_backend()
     chosen_model = None
     cpu_only_mode = False
@@ -613,11 +614,14 @@ def main_menu():
         # Display Current Status
         print(f"{C_YELLOW}--- Current Configuration ---{C_RESET}")
         
-        if cpu_only_mode:
-            print(f"  {C_BOLD}Hardware:{C_RESET} {hw['cpu_model']} {C_RED}[CPU ONLY MODE]{C_RESET}")
+        if hw is None:
+            print(f"  {C_BOLD}Hardware:{C_RESET} [Not scanned yet - Select option 3 or run benchmark]")
         else:
-            gpu_str = f"{hw['gpu_model']} ({hw['gpu_vram_gb']}GB)" if hw['gpu_model'] != "Unknown/CPU-Only" else "None Detected"
-            print(f"  {C_BOLD}Hardware:{C_RESET} {hw['cpu_model']} | GPU: {gpu_str}")
+            if cpu_only_mode:
+                print(f"  {C_BOLD}Hardware:{C_RESET} {hw['cpu_model']} {C_RED}[CPU ONLY MODE]{C_RESET}")
+            else:
+                gpu_str = f"{hw['gpu_model']} ({hw['gpu_vram_gb']}GB)" if hw['gpu_model'] != "Unknown/CPU-Only" else "None Detected"
+                print(f"  {C_BOLD}Hardware:{C_RESET} {hw['cpu_model']} | GPU: {gpu_str}")
             
         b_str = backend.upper() if backend else f"{C_RED}Not Detected{C_RESET}"
         print(f"  {C_BOLD}Backend:{C_RESET}  {b_str} {f'({base_url})' if base_url else ''}")
@@ -629,7 +633,7 @@ def main_menu():
         # Menu Options
         print(f"{C_CYAN}1.{C_RESET} Run Benchmark")
         print(f"{C_CYAN}2.{C_RESET} Toggle CPU-Only Mode")
-        print(f"{C_CYAN}3.{C_RESET} Re-Scan Hardware")
+        print(f"{C_CYAN}3.{C_RESET} Scan / Re-Scan Hardware (May take a moment)")
         print(f"{C_CYAN}4.{C_RESET} Detect / Change Backend")
         print(f"{C_CYAN}5.{C_RESET} Select Model")
         print(f"{C_CYAN}0.{C_RESET} Exit\n")
@@ -644,6 +648,11 @@ def main_menu():
                 input(f"\n{C_RED}[!] No model selected. Press Enter to return to menu...{C_RESET}")
                 continue
             
+            # Defer full scan until execution if user skipped option 3
+            if hw is None:
+                print(f"\n{C_CYAN}[i] Gathering system specs for the benchmark payload...{C_RESET}")
+                hw = get_system_specs(cpu_only_override=cpu_only_mode)
+
             print(f"\n{C_GREEN}[+] Starting Benchmark on {chosen_model}...{C_RESET}")
             print(f"    Context window: {CONTEXT_WINDOW} tokens")
             print("    This may take a few minutes...\n")
@@ -677,6 +686,12 @@ def main_menu():
                 with open(OUTPUT_FILE, "w") as f:
                     json.dump(payload, f, indent=4)
                 print(f"\n  {C_CYAN}[+] Results saved to {OUTPUT_FILE}{C_RESET}")
+
+                # RE-INSERTED COMMUNITY AND DISCORD FOOTER BLOCKS
+                print("\n  ─────────────────────────────────────────────────────")
+                print("  Share your results to contribute to the database!")
+                print("  Discord: [https://discord.gg/uZ2M8D9cWY]")
+                print("  ─────────────────────────────────────────────────────\n")
             else:
                 print(f"\n  {C_RED}[!] Benchmark failed: {results['error']}{C_RESET}")
             
@@ -684,11 +699,12 @@ def main_menu():
 
         elif choice == '2':
             cpu_only_mode = not cpu_only_mode
-            hw = get_system_specs(cpu_only_override=cpu_only_mode)
+            if hw is not None:
+                hw = get_system_specs(cpu_only_override=cpu_only_mode)
 
         elif choice == '3':
             clear_screen()
-            print(f"{C_CYAN}Re-scanning hardware...{C_RESET}\n")
+            print(f"{C_CYAN}Scanning hardware profiles...{C_RESET}\n")
             hw = get_system_specs(cpu_only_override=cpu_only_mode)
             input("\nPress Enter to return to menu...")
 
@@ -735,11 +751,8 @@ def main():
     WARMUP_RUN = not args.no_warmup
     INFERENCE_TIMEOUT_SEC = args.timeout
 
-    # If run with command line args, we bypass the menu for scripting automation
     if args.model or args.backend:
         print("[!] Running in headless CLI mode due to provided arguments...")
-        # ... You can re-implement the headless linear flow here if needed
-        # For now, it will just jump to the menu unless you strictly want to bypass it
         print("Headless mode logic goes here (omitted for CUI focus).")
         sys.exit(0)
 
